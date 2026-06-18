@@ -6,7 +6,7 @@ A data ingestion pipeline that extracts data from CSV, JSON, and API sources, va
 
 ## Tech Stack
 - **Language:** Python 3
-- **Database:** PostgreSQL (raw psycopg2 — no SQLAlchemy)
+- **Database:** PostgreSQL
 - **Libraries:** pandas, psycopg2-binary, pyyaml, python-dotenv, requests, pytest, pytest-cov
 
 ---
