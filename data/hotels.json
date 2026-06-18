@@ -1,0 +1,94 @@
+{
+  "hotels": [
+    {
+      "hotel_id": "H001",
+      "hotel_name": "Burj Al Arab",
+      "arrival_city": "Dubai",
+      "check_in": "2026-06-15",
+      "check_out": "2026-06-18",
+      "guest_name": "James Smith",
+      "price_per_night": 550.00
+    },
+    {
+      "hotel_id": "H002",
+      "hotel_name": "The Ritz Tokyo",
+      "arrival_city": "Tokyo",
+      "check_in": "2026-06-16",
+      "check_out": "2026-06-20",
+      "guest_name": "Sarah Johnson",
+      "price_per_night": 320.00
+    },
+    {
+      "hotel_id": "H003",
+      "hotel_name": "The Savoy",
+      "arrival_city": "London",
+      "check_in": "2026-06-15",
+      "check_out": "2026-06-17",
+      "guest_name": "Ahmed Al Farsi",
+      "price_per_night": 480.00
+    },
+    {
+      "hotel_id": "H004",
+      "hotel_name": "The Plaza",
+      "arrival_city": "New York",
+      "check_in": "2026-06-15",
+      "check_out": "2026-06-19",
+      "guest_name": "Marie Dupont",
+      "price_per_night": 420.00
+    },
+    {
+      "hotel_id": "H005",
+      "hotel_name": "Hotel Le Meurice",
+      "arrival_city": "Paris",
+      "check_in": "2026-06-15",
+      "check_out": "2026-06-18",
+      "guest_name": "Yuki Tanaka",
+      "price_per_night": 390.00
+    },
+    {
+      "hotel_id": "H006",
+      "hotel_name": "Atlantis The Palm",
+      "arrival_city": "Dubai",
+      "check_in": "2026-06-15",
+      "check_out": "2026-06-22",
+      "guest_name": "John Williams",
+      "price_per_night": 300.00
+    },
+    {
+      "hotel_id": "H007",
+      "hotel_name": "Park Hyatt Tokyo",
+      "arrival_city": "Tokyo",
+      "check_in": "2026-06-16",
+      "check_out": "2026-06-18",
+      "guest_name": "Emma Brown",
+      "price_per_night": 280.00
+    },
+    {
+      "hotel_id": "H008",
+      "hotel_name": "Claridge's",
+      "arrival_city": "London",
+      "check_in": "2026-06-15",
+      "check_out": "2026-06-20",
+      "guest_name": "Carlos Rivera",
+      "price_per_night": 510.00
+    },
+    {
+      "hotel_id": "H009",
+      "hotel_name": "The Standard",
+      "arrival_city": "New York",
+      "check_in": "2026-06-15",
+      "check_out": "2026-06-16",
+      "guest_name": "Aiko Sato",
+      "price_per_night": 250.00
+    },
+    {
+      "hotel_id": "H010",
+      "hotel_name": "Hotel de Crillon",
+      "arrival_city": "Paris",
+      "check_in": "2026-06-15",
+      "check_out": "2026-06-17",
+      "guest_name": "David Chen",
+      "price_per_night": 450.00
+    }
+  ]
+}

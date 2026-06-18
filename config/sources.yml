@@ -1,0 +1,16 @@
+sources:
+  # CSV
+  - name: flights
+    format: csv
+    path: data/flights.csv
+
+  # JSON
+  - name: hotels
+    format: json
+    path: data/hotels.json
+
+  # API
+  - name: weather
+    format: api
+    record_path: current
+    url: https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code,wind_speed_10m,precipitation

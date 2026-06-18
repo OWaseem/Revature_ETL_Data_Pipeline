@@ -1,0 +1,11 @@
+flight_id,departure_city,arrival_city,departure_time,arrival_time,delay_minutes,airline
+FL001,New York,Dubai,2026-06-15 08:00,2026-06-15 20:00,15,Emirates
+FL002,London,Tokyo,2026-06-15 09:30,2026-06-16 07:00,0,British Airways
+FL003,Paris,New York,2026-06-15 11:00,2026-06-15 13:30,30,Air France
+FL004,Dubai,London,2026-06-15 14:00,2026-06-15 18:30,0,Emirates
+FL005,Tokyo,Paris,2026-06-15 06:00,2026-06-15 14:00,45,Japan Airlines
+FL006,New York,London,2026-06-15 07:00,2026-06-15 19:00,0,Delta
+FL007,London,Dubai,2026-06-15 10:00,2026-06-15 20:30,10,British Airways
+FL008,Dubai,Tokyo,2026-06-15 03:00,2026-06-15 15:00,0,Emirates
+FL009,Paris,London,2026-06-15 12:00,2026-06-15 12:30,5,Air France
+FL010,Tokyo,New York,2026-06-15 16:00,2026-06-16 10:00,20,Japan Airlines
