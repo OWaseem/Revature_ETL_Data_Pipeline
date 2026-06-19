@@ -1,6 +1,6 @@
 # Revature ETL Data Pipeline
 
-A data ingestion pipeline that extracts data from CSV, JSON, and API sources, validates and cleans it, then loads it into PostgreSQL staging tables.
+A transportation data pipeline that extracts flight, hotel, and live weather data, validates and cleans it, then loads it into PostgreSQL staging tables.
 
 ---
 
@@ -13,12 +13,13 @@ A data ingestion pipeline that extracts data from CSV, JSON, and API sources, va
 
 ## Project Structure
 ```
-Revature_ETL_Data_Pipeline/ 
+Revature_ETL_Data_Pipeline/
   config/
     sources.yml        # defines all data sources
   data/
-    airports.json
-    ai_student_impact_dataset.csv
+    flights.csv        # flight records (pipeline source)
+    hotels.json        # hotel bookings (pipeline source)
+    airports.json      # lat/lon lookup table (not a pipeline source)
   src/
     config.py          # loads sources.yml
     readers/
@@ -59,26 +60,32 @@ Rejects Table      — bad rows saved to stg_rejects with a reason
 ## Data Sources
 | Name | Format | Location |
 |------|--------|----------|
-| airports | JSON | data/airports.json |
-| ai_student | CSV | data/ai_student_impact_dataset.csv |
-| dad_jokes | API | https://icanhazdadjoke.com/search |
+| flights | CSV | data/flights.csv |
+| hotels | JSON | data/hotels.json |
+| weather | API | https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code,wind_speed_10m,precipitation |
+
+**Note:** Weather API coordinates are looked up dynamically from `airports.json` based on `arrival_city` from each flight.
+
+**Cities in use:** Dubai, Tokyo, London, New York, Paris
 
 ---
 
 ## PostgreSQL Staging Tables
-- `stg_customers` — customer records
-- `stg_sales` — sales transactions
+- `stg_flights` — cleaned flight records
+- `stg_hotels` — cleaned hotel bookings
+- `stg_weather` — live weather at arrival cities
 - `stg_rejects` — rejected rows with reason and raw payload
 
 ---
 
 ## Validation Rules
-| Source | Rule |
-|--------|------|
-| airports | `lat`/`lon` must be numeric |
-| airports | `country` must be exactly 2 characters |
-| ai_student | `Pre_Semester_GPA` and `Post_Semester_GPA` must be >= 0 |
-| dad_jokes | `joke` must not be an empty string |
+| Source | Column | Rule |
+|--------|--------|------|
+| flights | `flight_id` | must not be null |
+| flights | `arrival_city` | must not be null |
+| flights | `delay_minutes` | must be >= 0 |
+| hotels | `guest_name` | must not be null |
+| hotels | `price_per_night` | must be > 0 |
 
 ---
 
@@ -88,13 +95,14 @@ Rejects Table      — bad rows saved to stg_rejects with a reason
 - [x] Step 3: Reader layer (csv, json, api)
 - [x] Step 4: config.py + sources.yml
 - [x] Step 5: main.py (orchestration skeleton)
-- [ ] Step 6: rules.py + validate.py
+- [x] Step 6: rules.py + validate.py
 - [ ] Step 7: clean.py
 - [ ] Step 8: load.py (psycopg2 UPSERT)
 - [ ] Step 9: .env + database connection
-- [ ] Step 10: tests (80%+ coverage)
-- [ ] Step 11: Real-world unclean datasets
-- [ ] Step 12: Flask dashboard (visualize pipeline + cleaned tables)
+- [ ] Step 10: Wire up main.py fully
+- [ ] Step 11: tests (80%+ coverage)
+- [ ] Step 12: Real-world unclean datasets
+- [ ] Step 13: Flask dashboard (visualize pipeline + cleaned tables)
 
 ---
 
