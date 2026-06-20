@@ -6,6 +6,10 @@ def read_api(url, record_path=None):
     data_dict = response.json()
 
     if record_path is not None:
-        return pd.json_normalize(data_dict, record_path)
+        section = data_dict[record_path]
+        if isinstance(section, list):
+            return pd.json_normalize(section)
+        else:
+            return pd.json_normalize([section])
     else:
         return pd.DataFrame(data_dict)

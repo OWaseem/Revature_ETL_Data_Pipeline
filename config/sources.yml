@@ -8,6 +8,7 @@ sources:
   - name: hotels
     format: json
     path: data/hotels.json
+    record_path: hotels
 
   # API
   - name: weather
