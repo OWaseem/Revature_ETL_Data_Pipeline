@@ -15,11 +15,11 @@ A transportation data pipeline that extracts flight, hotel, and live weather dat
 ```
 Revature_ETL_Data_Pipeline/
   config/
-    sources.yml        # defines all data sources
+    sources.yml        # defines all data sources and validation rules
   data/
     flights.csv        # flight records (pipeline source)
     hotels.json        # hotel bookings (pipeline source)
-    airports.json      # lat/lon lookup table (not a pipeline source)
+    airports.json      # reference data: city coords and airport info (pipeline source → stg_cities)
   src/
     config.py          # loads sources.yml
     readers/
@@ -27,9 +27,8 @@ Revature_ETL_Data_Pipeline/
       json_reader.py   # reads JSON → DataFrame
       api_reader.py    # fetches API → DataFrame
     validate.py        # checks nulls, types, domain rules
-    rules.py           # validation rule definitions
-    clean.py           # fixes/drops bad rows, normalizes columns
-    load.py            # batch UPSERT into PostgreSQL
+    clean.py           # strips whitespace, title-cases cities, fixes types, drops duplicates
+    load.py            # batch UPSERT into PostgreSQL, FK violations logged to stg_rejects
     main.py            # orchestrates the full pipeline
   tests/
     test_validate.py
@@ -46,13 +45,14 @@ Source (CSV / JSON / API)
     ↓
 Reader Layer       — reads data into a pandas DataFrame
     ↓
-Validation Layer   — checks nulls, data types, domain rules
+Clean Layer        — strips whitespace, normalizes casing, fixes data types
     ↓
-Cleaning Layer     — fixes/drops bad rows, normalizes column names
+Validation Layer   — checks nulls, types, domain rules (config-driven via sources.yml)
     ↓
 Load Layer         — batch UPSERT into PostgreSQL staging tables
+                   — FK violations caught and logged to stg_rejects
     ↓
-Rejects Table      — bad rows saved to stg_rejects with a reason
+Rejects Table      — bad rows saved to stg_rejects with source name and reason
 ```
 
 ---
@@ -60,31 +60,43 @@ Rejects Table      — bad rows saved to stg_rejects with a reason
 ## Data Sources
 | Name | Format | Location |
 |------|--------|----------|
+| airports | JSON | data/airports.json |
 | flights | CSV | data/flights.csv |
 | hotels | JSON | data/hotels.json |
-| weather | API | https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code,wind_speed_10m,precipitation |
+| weather | API | Open-Meteo (https://api.open-meteo.com) |
 
-**Note:** Weather API coordinates are looked up dynamically from `airports.json` based on `arrival_city` from each flight.
+**Note:** Airports is loaded first to populate `stg_cities` before FK-referencing tables.
+Weather API coordinates are looked up dynamically from `airports.json` based on `arrival_city` from each flight.
 
 **Cities in use:** Dubai, Tokyo, London, New York, Paris
 
 ---
 
 ## PostgreSQL Staging Tables
-- `stg_flights` — cleaned flight records
-- `stg_hotels` — cleaned hotel bookings
-- `stg_weather` — live weather at arrival cities
-- `stg_rejects` — rejected rows with reason and raw payload
+- `stg_cities` — reference table of airports/cities (primary key: `city`)
+- `stg_flights` — cleaned flight records (FK: `arrival_city` → `stg_cities.city`)
+- `stg_hotels` — cleaned hotel bookings (FK: `arrival_city` → `stg_cities.city`)
+- `stg_weather` — live weather at arrival cities (FK: `city` → `stg_cities.city`)
+- `stg_rejects` — rejected rows with reason, source name, and raw payload
 
 ---
 
 ## Validation Rules
 | Source | Column | Rule |
 |--------|--------|------|
+| airports | `city` | must not be null |
+| airports | `code` | must not be null |
+| airports | `country` | must not be null |
+| airports | `lat` | must not be null |
+| airports | `lon` | must not be null |
 | flights | `flight_id` | must not be null |
 | flights | `arrival_city` | must not be null |
+| flights | `departure_city` | must not be null |
 | flights | `delay_minutes` | must be >= 0 |
 | hotels | `guest_name` | must not be null |
+| hotels | `arrival_city` | must not be null |
+| hotels | `check_in` | must not be null |
+| hotels | `check_out` | must not be null |
 | hotels | `price_per_night` | must be > 0 |
 
 ---
@@ -95,14 +107,16 @@ Rejects Table      — bad rows saved to stg_rejects with a reason
 - [x] Step 3: Reader layer (csv, json, api)
 - [x] Step 4: config.py + sources.yml
 - [x] Step 5: main.py (orchestration skeleton)
-- [x] Step 6: rules.py + validate.py
-- [ ] Step 7: clean.py
-- [ ] Step 8: load.py (psycopg2 UPSERT)
-- [ ] Step 9: .env + database connection
-- [ ] Step 10: Wire up main.py fully
-- [ ] Step 11: tests (80%+ coverage)
-- [ ] Step 12: Real-world unclean datasets
-- [ ] Step 13: Flask dashboard (visualize pipeline + cleaned tables)
+- [x] Step 6: validate.py (config-driven rules via sources.yml)
+- [x] Step 7: clean.py
+- [x] Step 8: load.py (psycopg2 UPSERT + FK violation handling)
+- [x] Step 9: .env + database connection
+- [x] Step 10: Wire up main.py fully
+- [x] Step 10b: stg_cities + FK relationships + ERD in DBeaver
+- [ ] Step 11: structured logging
+- [ ] Step 12: tests (80%+ coverage)
+- [ ] Step 13: Real-world unclean datasets
+- [ ] Step 14: Flask dashboard (visualize pipeline + cleaned tables)
 
 ---
 

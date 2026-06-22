@@ -1,21 +1,19 @@
 import pandas as pd
-from rules import rules
 
 
-def validate(df, source):
-    source_rules = rules.get(source, [])
+def validate(df, source_name, rules):
     valid_rows = []
     rejected_rows = []
 
     for _, row in df.iterrows():
         passed = True
-        for rule in source_rules:
+        for rule in rules:
             column = rule["column"]
             condition = rule["condition"]
             value = row[column]
-            if not eval(condition):
+            if not eval(condition, {"value": value, "pd": pd}):
                 rejected_rows.append({
-                    "source_name": source,
+                    "source_name": source_name,
                     "raw_payload": row.to_dict(),
                     "reason": f"{column} failed: {condition}"
                 })

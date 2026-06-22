@@ -1,17 +1,67 @@
 sources:
+  # JSON — loaded first so cities exist before FK references
+  - name: airports
+    format: json
+    path: data/airports.json
+    record_path: airports
+    target_table: stg_cities
+    pk: city
+    rules:
+      - column: city
+        condition: "value is not None and not pd.isna(value)"
+      - column: code
+        condition: "value is not None and not pd.isna(value)"
+      - column: country
+        condition: "value is not None and not pd.isna(value)"
+      - column: lat
+        condition: "value is not None and not pd.isna(value)"
+      - column: lon
+        condition: "value is not None and not pd.isna(value)"
+
   # CSV
   - name: flights
     format: csv
     path: data/flights.csv
+    target_table: stg_flights
+    pk: flight_id
+    rules:
+      - column: flight_id
+        condition: "value is not None and not pd.isna(value)"
+      - column: arrival_city
+        condition: "value is not None and not pd.isna(value)"
+      - column: departure_city
+        condition: "value is not None and not pd.isna(value)"
+      - column: airline
+        condition: "value is not None and not pd.isna(value)"
+      - column: departure_time
+        condition: "value is not None and not pd.isna(value)"
+      - column: delay_minutes
+        condition: "value >= 0"
 
   # JSON
   - name: hotels
     format: json
     path: data/hotels.json
     record_path: hotels
+    target_table: stg_hotels
+    pk: hotel_id
+    rules:
+      - column: guest_name
+        condition: "value is not None and not pd.isna(value)"
+      - column: arrival_city
+        condition: "value is not None and not pd.isna(value)"
+      - column: check_in
+        condition: "value is not None and not pd.isna(value)"
+      - column: check_out
+        condition: "value is not None and not pd.isna(value)"
+      - column: price_per_night
+        condition: "value > 0"
 
   # API
   - name: weather
     format: api
-    record_path: current
     url: https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code,wind_speed_10m,precipitation
+    record_path: current
+    target_table: stg_weather
+    pk: city
+    rules: []

@@ -2,5 +2,6 @@ pandas
 psycopg2-binary
 pyyaml
 python-dotenv
+requests
 pytest
 pytest-cov
