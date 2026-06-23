@@ -17,6 +17,22 @@ def get_connection():
         password=os.getenv("DB_PASSWORD")
     )
 
+def get_city_coords(city):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        sql = "SELECT lat, lon FROM stg_cities WHERE city = %s;"
+        cursor.execute(sql, (city,))
+        row = cursor.fetchone()
+        if row is None:
+            return None, None
+        lat, lon = row
+        return lat, lon
+
+    finally:
+        cursor.close()
+        conn.close()
 
 def _serialize(obj):
     if hasattr(obj, "isoformat"):

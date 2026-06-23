@@ -29,6 +29,7 @@ Revature_ETL_Data_Pipeline/
     validate.py        # checks nulls, types, domain rules
     clean.py           # strips whitespace, title-cases cities, fixes types, drops duplicates
     load.py            # batch UPSERT into PostgreSQL, FK violations logged to stg_rejects
+    log.py             # configures structured logger (key=value format)
     main.py            # orchestrates the full pipeline
   tests/
     test_validate.py
@@ -113,8 +114,8 @@ Weather API coordinates are looked up dynamically from `airports.json` based on 
 - [x] Step 9: .env + database connection
 - [x] Step 10: Wire up main.py fully
 - [x] Step 10b: stg_cities + FK relationships + ERD in DBeaver
-- [ ] Step 11: structured logging
-- [ ] Step 12: tests (80%+ coverage)
+- [x] Step 11: structured logging (key=value format via Python logging module)
+- [x] Step 12: tests (87% coverage — 33 tests across validate, clean, load, config, log, main)
 - [ ] Step 13: Real-world unclean datasets
 - [ ] Step 14: Flask dashboard (visualize pipeline + cleaned tables)
 
