@@ -1,7 +1,7 @@
 sources:
   # JSON — loaded first so cities exist before FK references
   - name: airports
-    format: json
+    format: js`on
     path: data/airports.json
     record_path: airports
     target_table: stg_cities

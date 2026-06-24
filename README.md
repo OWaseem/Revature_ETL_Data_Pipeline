@@ -41,13 +41,14 @@ Revature_ETL_Data_Pipeline/
     test_log.py
     test_main.py
   dashboard/
-    app.py             # Flask app with 4 routes
+    app.py             # Flask app with 6 routes
     templates/
       base.html        # shared layout: dark navbar, active link highlighting, reject badge, footer
       overview.html    # pipeline stats + Chart.js bar charts (rows loaded, rejects by source)
       travel.html      # vw_travel_summary table with city count badge
       rejects.html     # rejected rows with live search/filter by source
       erd.html         # DBeaver ERD screenshot
+      table_view.html  # reusable staging table page (first 100 rows + search)
     static/
       erd.png          # exported ERD from DBeaver
   run_pipeline.sh      # runs src/main.py
@@ -149,6 +150,15 @@ Stat cards on the Overview page are clickable and link directly to their respect
 
 ---
 
+## Future Plans
+- **Real-world unclean datasets** — swap in messy public datasets (hospital records, music charts, transit logs) to stress-test the validation and clean layers against data that wasn't generated to spec
+- **LLM pipeline summary** — after each pipeline run, send key stats (rows loaded, rejects by source, top reject reasons) to an LLM and display a plain-English summary on the dashboard Overview page (e.g. "This run loaded 4,508 flights across 98 cities. Hotels had the most rejects, primarily due to missing guest names.")
+- **Scheduled pipeline runs** — use a scheduler (APScheduler or cron) to run the pipeline automatically on an interval and track run history in a new `pipeline_runs` log table
+- **Email/Slack alerts** — notify on high reject rates or pipeline failures
+- **Dockerize the project** — containerize the pipeline and dashboard so the whole stack can be spun up with `docker compose up`
+
+---
+
 ## Game Plan — Progress Tracker
 - [x] Step 1: requirements.txt
 - [x] Step 2: PostgreSQL database + staging tables
@@ -166,7 +176,6 @@ Stat cards on the Overview page are clickable and link directly to their respect
 - [x] Step 13: generate_data.py — 4500+ rows with 50 intentional dirty rows across 98 cities; cities, regions, and airline routes derived dynamically from airports.json
 - [x] Step 13b: vw_travel_summary — reporting view joining flights, hotels, and weather
 - [x] Step 14: Flask dashboard — 4-page app with Chart.js charts, reject badge, search/filter on rejects, city count badge on travel summary
-- [ ] Step 15: Real-world unclean datasets (hospital records, music, etc.)
 
 ---
 

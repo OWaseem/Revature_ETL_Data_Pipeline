@@ -1,19 +1,20 @@
 import os
+import math
 import psycopg2
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 app = Flask(__name__)
 
-LIMIT = 100
+PAGE_SIZE = 100
 
 TABLE_CONFIG = {
-    "cities":  {"table": "stg_cities",  "order": "city"},
-    "flights": {"table": "stg_flights", "order": "flight_id"},
-    "hotels":  {"table": "stg_hotels",  "order": "hotel_id"},
-    "weather": {"table": "stg_weather", "order": "city"},
+    "cities":  {"table": "stg_cities",  "order": "city",      "city_col": None},
+    "flights": {"table": "stg_flights", "order": "flight_id", "city_col": "arrival_city"},
+    "hotels":  {"table": "stg_hotels",  "order": "hotel_id",  "city_col": "arrival_city"},
+    "weather": {"table": "stg_weather", "order": "city",      "city_col": "city"},
 }
 
 
@@ -30,7 +31,7 @@ def get_connection():
 def query(sql, params=None):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute(sql, params)
+    cursor.execute(sql, params or ())
     rows = cursor.fetchall()
     cols = [desc[0] for desc in cursor.description]
     cursor.close()
@@ -85,14 +86,38 @@ def erd():
 def table_view(name):
     if name not in TABLE_CONFIG:
         return "Not found", 404
+
     cfg = TABLE_CONFIG[name]
     tbl = cfg["table"]
     order = cfg["order"]
+    city_col = cfg["city_col"]
 
-    _, total_rows = query(f"SELECT COUNT(*) FROM {tbl};")
+    page = max(1, request.args.get("page", 1, type=int))
+    city_filter = request.args.get("city", "").strip()
+
+    # Build WHERE clause if city filter is active
+    where = ""
+    params = []
+    if city_filter and city_col:
+        where = f"WHERE LOWER({city_col}) = LOWER(%s)"
+        params.append(city_filter)
+
+    _, total_rows = query(f"SELECT COUNT(*) FROM {tbl} {where};", params)
     total = total_rows[0][0]
+    total_pages = max(1, math.ceil(total / PAGE_SIZE))
+    page = min(page, total_pages)
+    offset = (page - 1) * PAGE_SIZE
 
-    cols, rows = query(f"SELECT * FROM {tbl} ORDER BY {order} LIMIT {LIMIT};")
+    cols, rows = query(
+        f"SELECT * FROM {tbl} {where} ORDER BY {order} LIMIT {PAGE_SIZE} OFFSET %s;",
+        params + [offset]
+    )
+
+    # City list for filter dropdown (only for tables with a city column)
+    city_list = []
+    if city_col:
+        _, city_rows = query(f"SELECT DISTINCT {city_col} FROM {tbl} ORDER BY {city_col};")
+        city_list = [r[0] for r in city_rows]
 
     return render_template(
         "table_view.html",
@@ -101,7 +126,12 @@ def table_view(name):
         cols=cols,
         rows=rows,
         total=total,
-        limit=LIMIT,
+        page=page,
+        total_pages=total_pages,
+        page_size=PAGE_SIZE,
+        city_filter=city_filter,
+        city_list=city_list,
+        city_col=city_col,
         reject_count=get_reject_count()
     )
 
