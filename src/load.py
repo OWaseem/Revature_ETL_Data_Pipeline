@@ -22,13 +22,13 @@ def get_city_coords(city):
     cursor = conn.cursor()
 
     try:
-        sql = "SELECT lat, lon FROM stg_cities WHERE city = %s;"
+        sql = "SELECT city, lat, lon FROM stg_cities WHERE LOWER(city) = LOWER(%s);"
         cursor.execute(sql, (city,))
         row = cursor.fetchone()
         if row is None:
-            return None, None
-        lat, lon = row
-        return lat, lon
+            return None, None, None
+        canonical_city, lat, lon = row
+        return canonical_city, lat, lon
 
     finally:
         cursor.close()

@@ -94,17 +94,19 @@ def test_get_city_coords_returns_coords(test_conn, monkeypatch):
     }])
     load(df, "stg_cities", "city", "airports")
 
-    lat, lon = get_city_coords("London")
+    canonical_city, lat, lon = get_city_coords("London")
+    assert canonical_city == "London"
     assert lat is not None
     assert lon is not None
 
 
 def test_get_city_coords_returns_none_for_unknown(monkeypatch):
-    # get_city_coords should return None, None for a city not in stg_cities
+    # get_city_coords should return None, None, None for a city not in stg_cities
     from load import get_city_coords
     monkeypatch.setenv("DB_NAME", os.getenv("TEST_DB_NAME"))
 
-    lat, lon = get_city_coords("Atlantis")
+    canonical_city, lat, lon = get_city_coords("Atlantis")
+    assert canonical_city is None
     assert lat is None
     assert lon is None
 

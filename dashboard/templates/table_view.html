@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex align-items-center mb-1">
+    <a href="/" class="text-muted text-decoration-none me-2" style="font-size:0.85rem">← Overview</a>
+</div>
+
+<h2 class="mb-1 fw-bold">{{ table }}</h2>
+<p class="text-muted mb-3">Staged data loaded from the most recent pipeline run.</p>
+
+<div class="mb-3 d-flex gap-2 align-items-center">
+    <input type="text" id="searchBox" class="form-control w-auto" placeholder="Search...">
+    <span class="badge bg-primary">
+        {% if total > limit %}Showing {{ limit }} of {{ total }} rows{% else %}{{ total }} rows{% endif %}
+    </span>
+</div>
+
+<div class="table-responsive bg-white shadow-sm rounded">
+    <table class="table table-bordered table-hover mb-0" id="dataTable">
+        <thead class="table-dark">
+            <tr>
+                {% for col in cols %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for val in row %}
+                <td>{{ val if val is not none else '—' }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if total > limit %}
+<p class="text-muted mt-2" style="font-size:0.8rem">
+    Showing the first {{ limit }} rows ordered by {{ cols[0] }}. Total in database: {{ total }}.
+</p>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const searchBox = document.getElementById("searchBox");
+
+    searchBox.addEventListener("input", function () {
+        const search = this.value.toLowerCase();
+        document.querySelectorAll("#dataTable tbody tr").forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(search) ? "" : "none";
+        });
+    });
+</script>
+{% endblock %}

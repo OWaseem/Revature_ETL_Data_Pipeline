@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-2">Travel Summary</h2>
+<p class="text-muted mb-2">City-level view joining flights, hotels, and live weather from three independent data sources.</p>
+<p class="mb-4"><span class="badge bg-primary">{{ rows|length }} cities</span></p>
+
+<div class="table-responsive bg-white shadow-sm rounded">
+    <table class="table table-bordered table-hover mb-0">
+        <thead class="table-dark">
+            <tr>
+                {% for col in cols %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for val in row %}
+                <td>{{ val if val is not none else '—' }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-2 fw-bold">Rejected Rows</h2>
+<p class="text-muted mb-3">Rows that failed validation rules or violated foreign key constraints during ingestion.</p>
+
+<div class="mb-3 d-flex gap-2">
+    <input type="text" id="searchBox" class="form-control w-auto" placeholder="Filter by source or reason...">
+    <select id="sourceFilter" class="form-select w-auto">
+        <option value="">All sources</option>
+        {% set sources = [] %}
+        {% for row in rows %}
+            {% if row[0] not in sources %}
+                {% set _ = sources.append(row[0]) %}
+                <option value="{{ row[0] }}">{{ row[0] }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    <span class="text-muted align-self-center" id="rowCount">{{ rows|length }} rows</span>
+</div>
+
+<div class="table-responsive bg-white shadow-sm rounded">
+    <table class="table table-bordered table-hover mb-0" id="rejectsTable">
+        <thead class="table-dark">
+            <tr>
+                <th>Source</th>
+                <th>Reason</th>
+                <th>Raw Payload</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td><code style="font-size:0.75rem">{{ row[2] }}</code></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const searchBox = document.getElementById("searchBox");
+    const sourceFilter = document.getElementById("sourceFilter");
+    const rowCount = document.getElementById("rowCount");
+
+    function filterTable() {
+        const search = searchBox.value.toLowerCase();
+        const source = sourceFilter.value.toLowerCase();
+        const rows = document.querySelectorAll("#rejectsTable tbody tr");
+        let visible = 0;
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const sourceMatch = !source || row.cells[0].innerText.toLowerCase() === source;
+            const searchMatch = !search || text.includes(search);
+            const show = sourceMatch && searchMatch;
+            row.style.display = show ? "" : "none";
+            if (show) visible++;
+        });
+
+        rowCount.textContent = visible + " rows";
+    }
+
+    searchBox.addEventListener("input", filterTable);
+    sourceFilter.addEventListener("change", filterTable);
+</script>
+{% endblock %}

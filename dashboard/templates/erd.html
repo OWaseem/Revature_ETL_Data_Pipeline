@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-2">Entity Relationship Diagram</h2>
+<p class="text-muted mb-4">FK relationships between staging tables, generated from the live database schema in DBeaver.</p>
+
+<div class="text-center bg-white shadow-sm rounded p-4">
+    <img src="/static/erd.png" alt="ETL Pipeline ERD" class="img-fluid rounded">
+</div>
+
+{% endblock %}
