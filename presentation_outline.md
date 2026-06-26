@@ -217,10 +217,12 @@ A traveler looking up hotels in a city shouldn't get results with a null guest n
 
 | Area | Plan |
 |------|------|
-| **Real-world data** | Replace generated data with public flight delay datasets (e.g. FAA/BTS data) to test the pipeline against truly unpredictable input |
+| **Real-world flight data** | Replace generated flight records with FAA/BTS public datasets — real US flight delays with actual airlines, routes, and delay causes — to stress-test the clean and validate layers against truly unpredictable input |
+| **Real-world hotel data** | Swap in Airbnb Open Data (Inside Airbnb) for real city-level lodging records — messy pricing, null fields, and inconsistent formats that would trigger the rejects table in meaningful ways |
 | **LLM summary** | After each run, send stats to an LLM and display a plain-English summary on the dashboard: *"Atlanta had the highest average delay at 47 minutes. Hotels there average $182/night with light rain forecast."* |
 | **Traveler-facing query** | Add a search bar where a user types a city name and gets a one-page summary — flights, hotels, weather — built directly from `vw_travel_summary` |
 | **Scheduled runs** | Use APScheduler to refresh weather data on an interval so the dashboard always shows current conditions |
+| **Bronze/Silver/Gold schema layers** | Introduce PostgreSQL schemas to separate data by maturity — `raw.*` for untouched source data, `staging.*` for cleaned and validated data, `gold.*` for reporting views like `vw_travel_summary` — mirroring how real data warehouses are structured |
 | **Docker** | `docker compose up` to spin up PostgreSQL + pipeline + dashboard as a single deployable stack |
 
 ---
